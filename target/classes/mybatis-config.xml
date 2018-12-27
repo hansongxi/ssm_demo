@@ -4,6 +4,11 @@
   "http://mybatis.org/dtd/mybatis-3-config.dtd">
 
 <configuration>
+<!-- properties?,settings?,typeAliases?,typeHandlers?,objectFactory?,objectWrapperFactory?,plugins?,environments?,databaseIdProvider?,mappers?)" -->
+	<!--日志部分，增加name为logImpl的setting配置，value属性（即日志的打印方式）可选有：SLF4J | LOG4J | LOG4J2 | JDK_LOGGING | COMMONS_LOGGING | STDOUT_LOGGING | NO_LOGGING，  -->
+	<settings>
+		<setting name="logImpl" value="LOG4J"/>
+	</settings>	
 	<!-- 全局别名设置，在映射文件中只需写别名，而不必写出整个类路径 -->
 	<typeAliases>
 		<typeAlias type="com.wntiem.ssm_web.bean.Person" alias="Person" />
@@ -11,4 +16,6 @@
 	<mappers>
 		<mapper resource="mybatis/PersonMapper.xml" />
 	</mappers>
+	
+
 </configuration>

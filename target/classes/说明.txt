@@ -24,3 +24,66 @@ GRANT ALL PRIVILEGES ON *.* TO 'root'@'%'WITH GRANT OPTION;被拒绝
 #update user set host='%' where user ='root';
 #flush privileges;
 再查看权限即可
+
+
+
+
+
+
+
+修改：关于mybatis中设置打印sql语句的问题
+为什么mybatis要配置mybatis-config的setting
+Mybatis内置的日志工厂提供日志功能，具体的日志实现有以下几种工具：
+SLF4J
+Apache Commons Logging
+Log4j2
+Log4j
+JDK logging
+具体选择哪个日志实现工具由MyBatis的内置日志工厂确定。它会使用最先找到的（按上文列举的顺序查找）。 如果一个都未找到，日志功能就会被禁用。
+不少应用服务器的classpath中已经包含Commons Logging，如Tomcat和WebShpere，
+ 所以MyBatis会把它作为具体的日志实现。记住这点非常重要。这将意味着，
+ 在诸如 WebSphere的环境中——WebSphere提供了Commons Logging的私有实现，
+ 你的Log4J配置将被忽略。 这种做法不免让人悲催，MyBatis怎么能忽略你的配置呢？
+ 事实上，因Commons Logging已经存 在了，按照优先级顺序，Log4J自然就被忽略了！
+ 不过，如果你的应用部署在一个包含Commons Logging的环境， 而你又想用其他的日志框架
+ ，你可以通过在MyBatis的配置文件mybatis-config.xml里面添加一项setting（配置）来选择一个不同的日志实现。
+
+
+如何配合：
+	1、在mybatis-spring中配置
+	<!-- 文件中的顺序：properties?,settings?,typeAliases?,typeHandlers?,objectFactory?,
+	objectWrapperFactory?,plugins?,environments?,databaseIdProvider?,mappers?)" -->
+	<!--日志部分，增加name为logImpl的setting配置，value属性（即日志的打印方式）可选有：SLF4J | LOG4J | LOG4J2 | JDK_LOGGING | COMMONS_LOGGING | STDOUT_LOGGING | NO_LOGGING，  -->
+	<settings>
+		<setting name="logImpl" value="LOG4J"/>
+	</settings>
+	2、在log4j.properties中配置：com.wntiem.ssm_web.mapper为mapper的包名
+	log4j.logger.org.mybatis=DEBUG
+	log4j.logger.com.wntiem.ssm_web.mapper=DEBUG
+问题：
+1、在mybatis-config中配置setting的时候注意顺序
+2、在写配置文件的时候最好不要从网上复制粘贴，可能会导致其他的占位符有错误
+在类中调用logger，必须先写左边的才能出来
+private static final Logger logger = LoggerFactory.getLogger(PersonController.class);
+3、主要导包的重要性,包导入的正确性
+<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-web</artifactId>
+			<version>2.5</version>
+		</dependency><!--解决Spring使用slf4j输出日志与log4j冲突的问题 -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.13</version>
+		</dependency>
+
